@@ -9,10 +9,10 @@ split_rate = 0.8
 
 
 def init():
-    if not os.path.exists(os.path.join(input, "train")):
-        os.mkdir(os.path.join(input, "train"))
-    if not os.path.exists(os.path.join(input, "validation")):
-        os.mkdir(os.path.join(input, "validation"))
+    if not os.path.exists(os.path.join(data_dir, "train")):
+        os.mkdir(os.path.join(data_dir, "train"))
+    if not os.path.exists(os.path.join(data_dir, "validation")):
+        os.mkdir(os.path.join(data_dir, "validation"))
 
 
 def split():
