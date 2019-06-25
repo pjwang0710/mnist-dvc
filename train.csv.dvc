@@ -1,0 +1,21 @@
+md5: 9dd43b2cc4ba4d64555c27d5d7172947
+cmd: python code/split_train_test.py 0.2 10
+wdir: .
+deps:
+- md5: 5c6512aa63c6860251f17a311347cea2
+  path: data/dataset.csv
+- md5: 308536b3b80375be4523569b5df96d8e
+  path: code/split_train_test.py
+- md5: eed8f8b0a2a42e5886b01b568b0d40d5
+  path: code/conf.py
+outs:
+- md5: 2eaba40c9ae9b765b42b30a912f1b6a2
+  path: data/train.csv
+  cache: true
+  metric: false
+  persist: false
+- md5: 78c823c5ad85e1c61db5847bc5a3bedc
+  path: data/test.csv
+  cache: true
+  metric: false
+  persist: false

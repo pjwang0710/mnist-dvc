@@ -3,12 +3,17 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from torch.utils.data.dataset import Dataset
 from torchvision import datasets, transforms
+from PIL import Image
+import pandas as pd
 import conf
 import sys
 import os
 
-data_dir = conf.data_dir
+INPUT = conf.source_image
+train_csv = conf.train_csv
+test_csv = conf.test_csv
 output_model = conf.model
 
 
@@ -65,6 +70,24 @@ def test(model, device, test_loader):
         100. * correct / len(test_loader.dataset)))
 
 
+class mnist_dataset(Dataset):
+    def __init__(self, csv_file, transform):
+        df = pd.read_csv(csv_file)
+        self.x_train = df['path']
+        self.y_train = self.mlb.transform(df['label']).astype(np.float32)
+        self.transform = transform
+
+    def __getitem__(self, index):
+        img = Image.open(os.path.join(INPUT, self.x_train[index]))
+        img = img.convert('RGB')
+        if self.transform is not None:
+            img = self.transform(img)
+        return img, self.y_train[index]
+
+    def __len__(self):
+        return len(self.x_train.index)
+
+
 def main():
     use_cuda = False
     torch.manual_seed(1)
@@ -83,8 +106,8 @@ def main():
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
         ])
-    train_datasets = datasets.ImageFolder(os.path.join(data_dir, "train"), train_transform)
-    test_datasets = datasets.ImageFolder(os.path.join(data_dir, "validation"), test_transform)
+    train_datasets = mnist_dataset(train_csv, train_transform)
+    test_datasets = mnist_dataset(test_csv, test_transform)
 
     train_loader = torch.utils.data.DataLoader(train_datasets, batch_size=32, shuffle=True, **kwargs)
     test_loader = torch.utils.data.DataLoader(test_datasets, batch_size=32, shuffle=True, **kwargs)

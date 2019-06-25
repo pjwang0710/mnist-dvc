@@ -1,0 +1,16 @@
+md5: 14d303ce191bce634a32dc06df989b59
+cmd: python code/image_to_csv.py
+wdir: .
+deps:
+- md5: fab796cd12e859f053717904e923682d.dir
+  path: data/dataset
+- md5: 5de99ea8fd9d344cad33b408e62dd5a2
+  path: code/image_to_csv.py
+- md5: eed8f8b0a2a42e5886b01b568b0d40d5
+  path: code/conf.py
+outs:
+- md5: 5c6512aa63c6860251f17a311347cea2
+  path: data/dataset.csv
+  cache: true
+  metric: false
+  persist: false

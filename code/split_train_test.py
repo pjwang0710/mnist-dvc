@@ -1,28 +1,21 @@
-from shutil import copyfile
+import pandas as pd
+import sys
+from sklearn.model_selection import train_test_split
 import conf
-import numpy as np
-import os
-
-data_dir = conf.data_dir
-source_image = conf.source_image
-split_rate = 0.8
+INPUT = conf.source_csv
+train_csv = conf.train_csv
+test_csv = conf.test_csv
 
 
-def init():
-    if not os.path.exists(os.path.join(data_dir, "train")):
-        os.mkdir(os.path.join(data_dir, "train"))
-    if not os.path.exists(os.path.join(data_dir, "validation")):
-        os.mkdir(os.path.join(data_dir, "validation"))
+def train_test_split_df(df, test_ratio, seed):
+    train, test = train_test_split(df, test_size=test_ratio, random_state=seed)
+    return train, test
 
 
-def split():
-    for sub_folder in os.listdir(source_image):
-        for i, img in enumerate(os.listdir(os.path.join(source_image, sub_folder))):
-            if i < int(len(os.listdir(os.path.join(source_image, sub_folder))*split_rate):
-                copyfile(os.path.join(source_image, sub_folder, img), os.path.join(data_dir, folder_type, "train", img))
-            else:
-                copyfile(os.path.join(source_image, sub_folder, img), os.path.join(data_dir, folder_type, "validation", img))
-
-sys.stderr.write('split data')
-split()
-        
+if __name__ == '__main__':
+    test_ratio = float(sys.argv[1])
+    seed = int(sys.argv[2])
+    df = pd.read_csv(INPUT)
+    train, test = train_test_split_df(df, test_ratio, seed)
+    train.to_csv(train_csv, index=False)
+    test.to_csv(test_csv, index=False)
