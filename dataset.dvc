@@ -1,0 +1,12 @@
+md5: eb39023c4ee04fcef847a11be5a6c03e
+cmd: unzip data/dataset.zip -d data/
+wdir: .
+deps:
+- md5: 2c3acb57e073e0d35e386db28f6b646d
+  path: data/dataset.zip
+outs:
+- md5: fab796cd12e859f053717904e923682d.dir
+  path: data/dataset
+  cache: true
+  metric: false
+  persist: false
