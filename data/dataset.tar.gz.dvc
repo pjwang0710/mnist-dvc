@@ -1,0 +1,8 @@
+md5: 6aea61aaa7a62a650886c2fe1609c8c4
+wdir: ..
+outs:
+- md5: 65c6918a1429e5b9c8a53bf4144075fd
+  path: data/dataset.tar.gz
+  cache: true
+  metric: false
+  persist: false
