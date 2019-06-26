@@ -4,7 +4,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.utils.data.dataset import Dataset
-from torchvision import datasets, transforms
+import numpy as np
+from torchvision import transforms
 from PIL import Image
 import pandas as pd
 import conf
@@ -20,46 +21,42 @@ output_model = conf.model
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(1, 20, 5, 1)
-        self.conv2 = nn.Conv2d(20, 50, 5, 1)
-        self.fc1 = nn.Linear(4*4*50, 500)
-        self.fc2 = nn.Linear(500, 10)
+        self.fc1 = nn.Linear(3*28*28, 500)
+        self.fc2 = nn.Linear(500, 256)
+        self.fc3 = nn.Linear(256, 10)
 
     def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.max_pool2d(x, 2, 2)
-        x = F.relu(self.conv2(x))
-        x = F.max_pool2d(x, 2, 2)
-        x = x.view(-1, 4*4*50)
+        x = x.view(-1, 3*28*28)
         x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-        return F.log_softmax(x, dim=1)
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
 
 
-def train(model, device, train_loader, optimizer, epoch):
+def train(model, criterion, device, train_loader, optimizer, epoch):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = data.to(device), target.to(device)
+        data, target = data.to(device), target.to(device).long()
         optimizer.zero_grad()
         output = model(data)
-        loss = F.nll_loss(output, target)
+        loss = criterion(output, target)
         loss.backward()
         optimizer.step()
-        if batch_idx % 10 == 0:
+        if batch_idx % 100 == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
 
 
-def test(model, device, test_loader):
+def test(model, criterion, device, test_loader):
     model.eval()
     test_loss = 0
     correct = 0
     with torch.no_grad():
         for data, target in test_loader:
-            data, target = data.to(device), target.to(device)
+            data, target = data.to(device), target.to(device).long()
             output = model(data)
-            test_loss += F.nll_loss(output, target, reduction='sum').item() # sum up batch loss
+            test_loss += criterion(output, target).item() # sum up batch loss
             pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
 
@@ -74,7 +71,7 @@ class mnist_dataset(Dataset):
     def __init__(self, csv_file, transform):
         df = pd.read_csv(csv_file)
         self.x_train = df['path']
-        self.y_train = self.mlb.transform(df['label']).astype(np.float32)
+        self.y_train = np.array(df['label'].astype(np.int32))
         self.transform = transform
 
     def __getitem__(self, index):
@@ -96,7 +93,7 @@ def main():
 
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
-    sys.stderr.write('load data')
+    print('load data')
     train_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.1307,), (0.3081,))
@@ -112,20 +109,21 @@ def main():
     train_loader = torch.utils.data.DataLoader(train_datasets, batch_size=32, shuffle=True, **kwargs)
     test_loader = torch.utils.data.DataLoader(test_datasets, batch_size=32, shuffle=True, **kwargs)
 
-    sys.stderr.write('train size:{}'.format(len(train_datasets)))
-    sys.stderr.write('test size:{}'.format(len(test_datasets)))
+    print('train size:{}'.format(len(train_datasets)))
+    print('test size:{}'.format(len(test_datasets)))
 
-    sys.stderr.write('load model')
+    print('load model')
     model = Net().to(device)
     optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.5)
+    criterion = nn.CrossEntropyLoss()
 
-    for epoch in range(1, 100 + 1):
-        train(model, device, train_loader, optimizer, epoch)
-        test(model, device, test_loader)
+    for epoch in range(1, 2):
+        train(model, criterion, device, train_loader, optimizer, epoch)
+        test(model, criterion, device, test_loader)
 
     if (True):
-        sys.stderr.write('save model in {}'.format(output_model))
-        torch.save(model.state_dict(), output_model)
+        print('save model in {}'.format(output_model))
+        torch.save(model, output_model)
 
 
 if __name__ == '__main__':

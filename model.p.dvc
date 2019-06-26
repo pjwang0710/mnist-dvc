@@ -1,0 +1,18 @@
+md5: 95f1858b653ccb54127b03a15034222d
+cmd: python code/train_model.py
+wdir: .
+deps:
+- md5: 2eaba40c9ae9b765b42b30a912f1b6a2
+  path: data/train.csv
+- md5: 78c823c5ad85e1c61db5847bc5a3bedc
+  path: data/test.csv
+- md5: 0cf59cc3d45ca53d602ce0b19c461bcc
+  path: code/train_model.py
+- md5: eed8f8b0a2a42e5886b01b568b0d40d5
+  path: code/conf.py
+outs:
+- md5: e5c1a1f86e88430cc5338b5a39995271
+  path: data/model.p
+  cache: true
+  metric: false
+  persist: false

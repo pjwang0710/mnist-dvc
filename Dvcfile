@@ -1,0 +1,16 @@
+md5: 0467c6b8d81228c0bd26f310ed2100f5
+cmd: python code/evaluate.py
+wdir: .
+deps:
+- md5: e5c1a1f86e88430cc5338b5a39995271
+  path: data/model.p
+- md5: d04902067c1b45139034f84d801b0430
+  path: code/evaluate.py
+- md5: eed8f8b0a2a42e5886b01b568b0d40d5
+  path: code/conf.py
+outs:
+- md5: 7c861b7d1e44fd6f240922edbd4752e0
+  path: data/eval.txt
+  cache: false
+  metric: true
+  persist: false
