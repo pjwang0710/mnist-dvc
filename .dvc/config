@@ -1,0 +1,4 @@
+['remote "upstream"']
+url = s3://h3o-ai/mnist
+[core]
+remote = upstream
